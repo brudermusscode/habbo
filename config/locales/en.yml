@@ -1,0 +1,11 @@
+en:
+  errors:
+    format: '%{attribute}%{message}'
+    messages:
+      blank: 'can't be blank'
+      empty: 'is empty'
+      taken: 'was taken already!'
+      yuuzaa:
+        username:
+          format: 'is invalid (Letters, numbers and _ only)'
+          length: 'must be between 3 to 12 chars'

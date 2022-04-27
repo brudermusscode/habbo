@@ -1,0 +1,73 @@
+version: '3'
+
+networks:
+  development:
+  test:
+
+volumes:
+  mysql:
+  bundle_data:
+
+services:
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: rails s -p 80 -b '0.0.0.0'
+    volumes:
+      - .:/app
+      - bundle_data:/var/lib/bundle_data
+    environment:
+      RAILS_ENV: development
+      MYSQL_HOST: mysql
+      MYSQL_ROOT_PASSWORD: secret
+    ports:
+      - 80:80
+    networks:
+      - development
+    depends_on:
+      - mysql
+
+  # worker:
+
+  mysql:
+    image: mysql:latest
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: secret
+    ports:
+      - '8081:3306'
+    expose:
+      - '3306'
+    volumes:
+      - mysql:/var/lib/mysql
+    networks:
+      - development
+      - test
+
+
+  pma:
+    image: phpmyadmin:latest
+    environment:
+      PMA_HOST: mysql
+      PMA_USER: root
+      PMA_PASSWORD: secret
+      PMA_PORT: 3306
+      PMA_ARBITRARY: 1
+    restart: always
+    ports:
+      - 727:80
+    networks:
+      - development
+      - test
+    depends_on:
+      - mysql
+
+  mailhog:
+    image: mailhog/mailhog
+    logging:
+      driver: 'none'  # disable saving logs
+    ports:
+      - 1025:1025 # smtp server
+      - 81:8025 # web ui
